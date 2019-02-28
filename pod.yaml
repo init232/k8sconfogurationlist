@@ -1,4 +1,3 @@
-hahahaha
 apiVersion: v1
 # <string>指定api资源版本,格式group/version
 kind: Pod
