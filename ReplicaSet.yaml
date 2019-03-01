@@ -17,6 +17,9 @@ metadata:
     jc.com/created-by: "cluster admin"
 spec:
 # <Object>指定期望状态
+  minReadySeconds: 0
+  # <integer> 新建的pod对象在启动多长时间内如果其容器未发生异常即被视"就绪"
+  # 默认0s
   replicas: 2
   # <integer>需要维持的副本数量
   selector:
@@ -48,6 +51,12 @@ spec:
         # 必须对应上面定义的标签选择器规则,可以比上面多不可以比上面少
     spec:
     # <Object>定义模版的spec,基本与pod资源相同
+      hostNetwork: false
+      # <boolean>是否使用HOST主机网络名称空间,默认不使用
+      hostIPC: false
+      # <boolean> 是否共享IPC名称空间
+      hostPID: false
+      # <boolean>是否共享host主机的PID名称空间
       restartPolicy: Always
       # <string> 定义的容器重启策略
       # Always(挂了必须重启)
@@ -70,6 +79,15 @@ spec:
         # <string>镜像获取策略,Always(不论有没有总是去仓库), Never(本地有就用,没有就等待)
         # IfNotPresent(如果本地存在就使用,没有就下载),如果标签是latest的默认值为Always
         # 否则默认值为IfNotPresent,一旦创建不可以更改。
+        env:
+        # <[]Object> 定义容器环境变量的两种写法
+        # 可以使用kv方式定义,可以定义多个
+        - name: REDIS_HOST
+        # <string> -required-变量名称
+          value: redis.default.svc.cluster.local
+        #<string> 变量的值
+        valueFrom:
+        # <Object> 使用文件定义
         lifecycle:
         # <Object>生命周期钩子
           postStart:
