@@ -24,16 +24,16 @@ spec:
   # <integer>需要维持的副本数量
   selector:
   # <Object>支持下面标签选择器,二选一
-  	matchLabels:
-  	# <map[string]string> 支持给定多个键值对,格式如下
-  	  app: myapp
-  	  release: canary
-  	matchExpressions:
-  	# <[]Object>基于给的表达式来定义使用标签选择器,格式如下
-  	  - {key: tier, operator: In, values: [cache]}
-  	  # 支持一下操作符:
-  	  # In,    NotIn:    字段的值必须非空列表
-  	  # Exists, NotExists:    字段的值必须未空列表
+    matchLabels:
+    # <map[string]string> 支持给定多个键值对,格式如下
+      app: myapp
+      release: canary
+    matchExpressions:
+    # <[]Object>基于给的表达式来定义使用标签选择器,格式如下
+      - {key: tier, operator: In, values: [cache]}
+      # 支持一下操作符:
+      # In,    NotIn:    字段的值必须非空列表
+      # Exists, NotExists:    字段的值必须未空列表
   template:
   # <Object>定义副本模版
     metadata:
