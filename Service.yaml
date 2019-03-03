@@ -57,3 +57,9 @@ spec:
   # <string> 指定会话保持,两个选项
   # ClientIP 基于ipvs规则调度,同一个客户端ip地址始终调度到同一后端pod
   # None 默认选项,随机调度
+  sessionAffinityConfig:
+  # <Object>会话保持配置
+    clientIP:
+    # sessionAffinity使用clientIP下的配置项
+      timeoutSeconds: 10800
+      # <integer>配置会话保持时长,默认10800s
