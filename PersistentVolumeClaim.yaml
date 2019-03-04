@@ -48,7 +48,7 @@ spec:
       # 支持一下操作符:
       # In,    NotIn:    字段的值必须非空列表
       # Exists, NotExists:    字段的值必须未空列表
-  volumeMode:
+  volumeMode: Filesystem
   # <string> 后端存储卷模式,根据类型来选择绑定存储卷的,目前测试阶段
   volumeName: myapp
   # <string> 此选项直接精确绑定到某个pv存储卷上面

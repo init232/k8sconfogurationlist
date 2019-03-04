@@ -228,13 +228,14 @@ spec:
     volumeMounts:
     # <[]Object>指定挂载存储资源配置,可以挂载多个,每个name定义一个
     - name: testvolumes
-    # <string> -required- 挂载卷资源的名称
+    # <string> -required- 下面定义好要挂载卷资源的名称
       mountPath: /data/web/html 
       # <string> -required- 挂载在容器的对应路径
       readOnly: false
       # <boolean>是否要只读挂载,默认为false
-      subPath:
-      # <string>是否挂载到子路径下
+      subPath: test
+      # <string>挂载卷时使用的子路径
+      # 即在mountPath指定的路径下使用一个子路径作为其挂载点
   volumes:
   # <[]Object>定义存储资源类型,可以定义多个卷,每个name对应一个类型
   - name: testvolumes
@@ -251,6 +252,14 @@ spec:
     gitRepo:
     # <Object> gitRepo类型,在创建容器的时候往远程仓库拉一次数据
     # 但拉下来以后新的变动数据不会像仓库提交
+    # 使用的机器必须要安装git
+    # k8s在1.12时已经废弃
+      repository: https://gitee.com/76439984/shell.git
+      # <string> -required- 仓库地址
+      revision: master
+      # <string> 特定revision的提交hash码
+      directory: .
+      # <string> .表示直接将仓库复制到卷目录中
     nfs:
     # <Object> nfs类型,定义使用nfs,当一个卷来用,如果多目录需要写多个
     # nfs共享存储需要预先部署,例如nfs服务器共享/data/volumes
@@ -268,8 +277,9 @@ spec:
       type: DirectoryOrCreate
       # <string> 类型用于影响path的属性
       # DirectoryOrCreate    挂载一个已存在的目录,若不存在就创建
+      # 创建的权限为0755 属主kubelet
       # Directory    必须实现存在,不存在就报错
-      # FileOrCreate    挂载一个文件不存在就创建
+      # FileOrCreate    挂载一个文件不存在就创建,0644 属主kubelet
       # File    必须是一个文件,没有就报错
       # Socket    必须是一个Socket文件
       # CharDevice    必须是个字符类的文件
@@ -281,3 +291,64 @@ spec:
       # <string> -required-调用的pvc资源名称
       readOnly: false
       # <boolean>是否只读模式,默认false
+    rbd:
+    # <Object> rbd类型,
+    #创建ceph分布式存储卷,需要在每个节点上安装ceph软件包
+      monitors:
+      # <[]string> -required- ceph存储监视器,逗号分隔
+      - '192.168.16.200:6789'
+      - '192.168.16.201:6789'
+      - '192.168.16.202:6789'
+      image: redis
+      # <string> -required- image的名称
+      pool: kube
+      # <string> rados存储池名称,默认为RBD
+      user: admin
+      # <string> rados用户名,默认admin
+      keyring :
+      # <string> 认证时使用的keyring文件路径,默认/etc/ceph/keyring
+      secretRef:
+      # <Object> 认证时使用的保存有相应认证信息的secret对象
+      # 会覆盖有keyring字段提供的密钥信息
+        name: ceph-secret
+        # <string> 对象名称
+      readOnly: false
+      # <boolean>是否只读,默认false
+      fsType: ext4
+      # <string> 要挂载卷的文件系统类型
+      # 文件类型必须是节点操作系统支持的文件系统类型
+      # 例如 ext4 xfs ntfs等,默认ext4
+    glusterfs:
+    # <Object> glusterfs类型,使用glusterfs集群
+    # 需要在各节点上部署glusterfs和glusterfs-fuse
+    # 支持动态供给机制,需要部署heketi用户请求存储管理接口
+      endpoints: glusterfs-endpoints
+      # <string> -required- endpoints资源名称,endpoints预先配置好
+      # 用于提供gluster集群的节点信息作为访问入口
+      path: kube-redis
+      # <string> -required- 用到的gfs集群的卷路径
+      readOnly: false
+      # <boolean> 是否只读,默认false
+    cinder:
+    # <Object> cinder类型
+      volumeID: e2b8d2f7-wece-90dl-a505-4acf607a90bc 
+      # <string> -required- 用于表示cinder的存储卷标识符
+      readOnly: false
+      # <boolean>是否只读,默认false
+      fsType: ext4
+      # <string> 要挂载卷的文件系统类型
+      # 文件类型必须是节点操作系统支持的文件系统类型
+      # 例如 ext4 xfs ntfs等,默认ext4
+
+
+
+
+
+
+
+
+
+
+
+
+

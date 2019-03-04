@@ -275,13 +275,14 @@ spec:
         volumeMounts:
         # <[]Object>指定挂载存储资源配置,可以挂载多个,每个name定义一个
         - name: testvolumes
-        # <string> -required- 挂载卷资源的名称
+        # <string> -required- 下面定义好要挂载卷资源的名称
           mountPath: /data/web/html 
           # <string> -required- 挂载在容器的对应路径
           readOnly: false
           # <boolean>是否要只读挂载,默认为false
           subPath:
-          # <string>是否挂载到子路径下
+          # <string>挂载卷时使用的子路径
+          # 即在mountPath指定的路径下使用一个子路径作为其挂载点
       volumes:
       # <[]Object>定义存储资源类型,可以定义多个卷,每个name对应一个类型
       - name: testvolumes
@@ -298,6 +299,14 @@ spec:
         gitRepo:
         # <Object> gitRepo类型,在创建容器的时候往远程仓库拉一次数据
         # 但拉下来以后新的变动数据不会像仓库提交
+        # 使用的机器必须要安装git
+        # k8s在1.12时已经废弃
+          repository: https://gitee.com/76439984/shell.git
+          # <string> -required- 仓库地址
+          revision: master
+          # <string> 特定revision的提交hash码
+          directory: .
+          # <string> .表示直接将仓库复制到卷目录中
         nfs:
         # <Object> nfs类型,定义使用nfs,当一个卷来用,如果多目录需要写多个
         # nfs共享存储需要预先部署,例如nfs服务器共享/data/volumes
