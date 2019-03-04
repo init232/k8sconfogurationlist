@@ -242,24 +242,78 @@ spec:
           # <integer>指定端口
           protocol: TCP
           # <string>指定协议,默认TCP
-      command: 
-      - "/bin/sh"
-      - "-c"
-      - "sleep 7200"  
-      # <[]string>用来覆盖容器启动命令,类似docker的Entrypoint,且代码不会运行在shell中
-      # 如果要运行在shell中必须指明命令
-      # 如果没有提供command且镜像里面提供了Entrypoint,则运行容器的Entrypoint
-      args: ["-c", "while true; do echo hello; sleep 10;done"]
-      # <[]string>容器没有定义CMD时,作为参数传递给容器的Entrypoint
-      # 容器本身定义了CMD时,则覆盖容器里面的CMD所定义的内容接将args指定作为参数传给Entrypoint
-      # 变量引用格式$(VAR_NAME),如果不想被引用$$(VAR_NAME)
-      # command与args详细关系如下:
-      # https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
-      # 如果没有定义command也没有定义args,则默认使用docker镜像中的Entrypoint与Cmd
-      # 如果只提供command但没有提供args,则只运行command,镜像中的Entrypoint与Cmd被忽略
-      # 如果只提供args但没定义command,则使用镜像中的Entrypoint做命令,把args当参数传入,忽略镜像中的Cmd
-      # 如果提供了command与args,就表示完全自定义参数,镜像中的Entrypoint与Cmd被忽略
-
-
+        command: 
+        - "/bin/sh"
+        - "-c"
+        - "sleep 7200"  
+        # <[]string>用来覆盖容器启动命令,类似docker的Entrypoint,且代码不会运行在shell中
+        # 如果要运行在shell中必须指明命令
+        # 如果没有提供command且镜像里面提供了Entrypoint,则运行容器的Entrypoint
+        args: ["-c", "while true; do echo hello; sleep 10;done"]
+        # <[]string>容器没有定义CMD时,作为参数传递给容器的Entrypoint
+        # 容器本身定义了CMD时,则覆盖容器里面的CMD所定义的内容接将args指定作为参数传给Entrypoint
+        # 变量引用格式$(VAR_NAME),如果不想被引用$$(VAR_NAME)
+        # command与args详细关系如下:
+        # https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+        # 如果没有定义command也没有定义args,则默认使用docker镜像中的Entrypoint与Cmd
+        # 如果只提供command但没有提供args,则只运行command,镜像中的Entrypoint与Cmd被忽略
+        # 如果只提供args但没定义command,则使用镜像中的Entrypoint做命令,把args当参数传入,忽略镜像中的Cmd
+        # 如果提供了command与args,就表示完全自定义参数,镜像中的Entrypoint与Cmd被忽略
+        volumeMounts:
+        # <[]Object>指定挂载存储资源配置,可以挂载多个,每个name定义一个
+        - name: testvolumes
+        # <string> -required- 挂载卷资源的名称
+          mountPath: /data/web/html 
+          # <string> -required- 挂载在容器的对应路径
+          readOnly: false
+          # <boolean>是否要只读挂载,默认为false
+          subPath:
+          # <string>是否挂载到子路径下
+      volumes:
+      # <[]Object>定义存储资源类型,可以定义多个卷,每个name对应一个类型
+      - name: testvolumes
+      # <string> -required-定义存储资源名称,对应下面的类型,每次定义选其一
+        configMap:
+        # <Object> 用于统一存明文放配置文件的资源,再以特殊存储卷的方式挂载
+        emptyDir: 
+        # <Object> emptyDir类型,在node上启动一个pod并在本地分配一个存储卷,一旦pod删除存储卷也被删除,
+        # 一般用作临时目录或者缓存使用,此存储卷是可以宿主机的内存空间
+          medium:
+          # <string>媒介类型,磁盘或者memory,如果为""空,默认为磁盘
+          sizeLimit:
+          # <string>空间上限
+        gitRepo:
+        # <Object> gitRepo类型,在创建容器的时候往远程仓库拉一次数据
+        # 但拉下来以后新的变动数据不会像仓库提交
+        nfs:
+        # <Object> nfs类型,定义使用nfs,当一个卷来用,如果多目录需要写多个
+        # nfs共享存储需要预先部署,例如nfs服务器共享/data/volumes
+        # 会自动挂载到nfs服务器的共享目录
+          path: /data/volumes
+          # <string> -required- nfs共享路径
+          server: 192.168.16.210
+           # <string> -required-服务器地址
+          readOnly: false
+          # <boolean>是否设置成只读,默认false
+        hostPath:
+        # <Object> hostPath类型,宿主机路径,把宿主机目录挂到pod,pod删除后数据不删除
+          path: /data/pod/volume1
+          # <string> -required-指定宿主路径
+          type: DirectoryOrCreate
+          # <string> 类型用于影响path的属性
+          # DirectoryOrCreate    挂载一个已存在的目录,若不存在就创建
+          # Directory    必须实现存在,不存在就报错
+          # FileOrCreate    挂载一个文件不存在就创建
+          # File    必须是一个文件,没有就报错
+          # Socket    必须是一个Socket文件
+          # CharDevice    必须是个字符类的文件
+          # BlockDevice    必须是块类型的文件
+          # https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+        persistentVolumeClaim:
+        # <Object> pvc类型,用来挂载已经定义好的pvc
+          claimName: xxx
+          # <string> -required-调用的pvc资源名称
+          readOnly: false
+          # <boolean>是否只读模式,默认false
 
 
