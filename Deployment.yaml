@@ -126,19 +126,34 @@ spec:
               # <boolean> 当找不定义引用的key是否忽略报错
             fieldRef:
             # <Object>引用当前pod的字段,支持如下
-            # spec.nodeName 节点名称
-            # status.hostIP 节点ip地址
-            # status.podIP pod对象的ip地址
-            # metadata.name pod对象名称
-            # metadata.namespace pod对象名称空间
-            # metadata.labels['KEY']  pod对象标签中指定键的值
-            # metadata.annotations['KEY'] pod对象标签中指定键的值
-            # metadata.uid pod对象的uid
-            # spec.serviceAccountName pod对象使用的serviceAccountName资源名称
+              fieldPath: spec.nodeName
+              # spec.nodeName 节点名称
+              # status.hostIP 节点ip地址
+              # status.podIP pod对象的ip地址
+              # metadata.name pod对象名称
+              # metadata.namespace pod对象名称空间
+              # metadata.labels['KEY']  pod对象标签中指定键的值
+              # metadata.annotations['KEY'] pod对象标签中指定键的值
+              # metadata.uid pod对象的uid
+              # spec.serviceAccountName pod对象使用的serviceAccountName资源名称
             resourceFieldRef:
             # <Object> 引用资源需求与限制的数据
             secretKeyRef:
             # <Object> 引用secret对象资源的数据
+              name: mysql-root-password
+              # <string> 引用的configmap资源名称
+              key: password
+              # <string> -required- 引用的key
+        envFrom:
+        # <[]Object> 同时将多个configmap里面的所有键值导入
+        - prefix: HTCFG_
+        # <string> 避免多个configmap引用的键冲突,在每个键前使用前缀
+          configMapRef: 
+          # <Object>引用configmap的键值,configmap需要实现创建好
+          name: nginx-config
+          # <string> 需要引用configmap资源的名称
+          optional: flase
+          # <boolean> 当找不定义引用的key是否忽略报错 
         lifecycle:
         # <Object>生命周期钩子
           postStart:
@@ -320,7 +335,11 @@ spec:
         # <boolean>是否要只读挂载,默认为false
         subPath:
         # <string>挂载卷时使用的子路径
-        # 即在mountPath指定的路径下使用一个子路径作为其挂载点   
+        # 即在mountPath指定的路径下使用一个子路径作为其挂载点 
+    imagePullSecrets:
+    # <[]Object> 引用外面定义好的仓库secrets对象
+      name: local-registry
+      # <string> 仓库secrets对象名称  
     volumes:
     # <[]Object>定义存储资源类型,可以定义多个卷,每个name对应一个类型
     - name: testvolumes
@@ -329,6 +348,21 @@ spec:
       # <Object> 用于统一存明文放配置文件的资源,再以特殊存储卷的方式挂载
         name: nginx-config
         # <string> 定义需要应用的configmap资源名称,configmap资源需要先定义好
+        items:
+        # <[]Object> 用于当configmap是以目录来定义的
+        # 而目录里面有多个文件
+        # 当要导出指定的文件作为key时使用
+        # 每个-key配置块导入一个文件
+        - key: myserver.conf
+        # 键名
+          path: myserver.conf
+          # <string> -required- 挂载到容器时候的文件名
+          mode: 0644
+          # <integer> 权限
+      secret:
+      # <Object> secret类型,除了secretName配置几乎configmap相同
+        secretName: nginx-ssl
+        # <string> 指定secretName资源名称
       emptyDir: 
       # <Object> emptyDir类型,在node上启动一个pod并在本地分配一个存储卷,一旦pod删除存储卷也被删除,
       # 一般用作临时目录或者缓存使用,此存储卷是可以宿主机的内存空间
