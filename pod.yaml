@@ -48,12 +48,43 @@ spec:
     env:
     # <[]Object> 定义容器环境变量的两种写法
     # 可以使用kv方式定义,可以定义多个
-    - name: REDIS_HOST
-    # <string> -required-变量名称
+    - name: REDIS_HOST 
+    # <string> -required- kv写法,name对应容器来面变量名称
+    # 每个变量一个name
+    # 此字段也可以是容器里面服务配置文件里面的变量名称
+    # 里面定义叫什么这里就要写什么
       value: redis.default.svc.cluster.local
-    #<string> 变量的值
-    valueFrom:
-    # <Object> 使用文件定义
+      #<string> 变量的值
+    - name: REDIS_HOST 
+    # <string> -required- 引用其他资源写法,name对应容器来面变量名称 
+    # 每个变量一个name  
+    # 此字段也可以是容器里面服务配置文件里面的变量名称
+    # 里面定义叫什么这里就要写什么 
+      valueFrom:
+      # <Object> 引用其他对象数据给变量赋值,此段为赋值部分
+        configMapKeyRef:
+        # <Object>引用configmap的键值,configmap需要实现创建好
+          name: nginx-config
+          # <string> 需要引用configmap资源的名称
+          key: nginx_port
+          # <string> -required- 需要在资源对象里面引用的key 
+          optional: flase
+          # <boolean> 当找不定义引用的key是否忽略报错
+        fieldRef:
+        # <Object>引用当前pod的字段,支持如下
+        # spec.nodeName 节点名称
+        # status.hostIP 节点ip地址
+        # status.podIP pod对象的ip地址
+        # metadata.name pod对象名称
+        # metadata.namespace pod对象名称空间
+        # metadata.labels['KEY']  pod对象标签中指定键的值
+        # metadata.annotations['KEY'] pod对象标签中指定键的值
+        # metadata.uid pod对象的uid
+        # spec.serviceAccountName pod对象使用的serviceAccountName资源名称
+        resourceFieldRef:
+        # <Object> 引用资源需求与限制的数据
+        secretKeyRef:
+        # <Object> 引用secret对象资源的数据
     lifecycle:
     # <Object>生命周期钩子
       postStart:
@@ -242,6 +273,8 @@ spec:
   # <string> -required-定义存储资源名称,对应下面的类型,每次定义选其一
     configMap:
     # <Object> 用于统一存明文放配置文件的资源,再以特殊存储卷的方式挂载
+      name: nginx-config
+      # <string> 定义需要应用的configmap资源名称,configmap资源需要先定义好
     emptyDir: 
     # <Object> emptyDir类型,在node上启动一个pod并在本地分配一个存储卷,一旦pod删除存储卷也被删除,
     # 一般用作临时目录或者缓存使用,此存储卷是可以宿主机的内存空间
