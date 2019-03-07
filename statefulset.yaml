@@ -370,5 +370,7 @@ spec:
       # 即只更新1个,相当于金丝雀更新,当没问题的时候再将partition改为0
       # 接着更新所有
     type: rollingUpdate
-    # <string> 更新策略类型,默认rollingUpdate
+    # <string> 两种更新策略二选一,默认RollingUpdate
+    # OnDelete (重建,建一个删一个)
+    # RollingUpdate (滚动更新)
 
