@@ -71,6 +71,9 @@ spec:
         # 必须对应上面定义的标签选择器规则,可以比上面多不可以比上面少
     spec:
     # <Object>定义模版的spec,基本与pod资源相同
+      serviceAccountName: jcadmin
+      # <string> 指定pod连接apiserver时使用的帐号,需要在外面预先创建
+      # 也可以用于连接私有的镜像仓库    
       hostNetwork: false
       # <boolean>是否使用HOST主机网络名称空间,默认不使用
       hostIPC: false
