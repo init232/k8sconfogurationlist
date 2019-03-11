@@ -25,7 +25,7 @@ spec:
       release: canary
     matchExpressions:
     # <[]Object>基于给的表达式来定义使用标签选择器,格式如下
-      - {key: tier, operator: In, values: [cache]}
+      - {key: tier, operator: In, values: ["cache"]}
       # 支持一下操作符:
       # In,    NotIn:    字段的值必须非空列表
       # Exists, NotExists:    字段的值必须未空列表
@@ -49,6 +49,166 @@ spec:
         # 必须对应上面定义的标签选择器规则,可以比上面多不可以比上面少
     spec: 
     # <Object>指定期望状态
+      affinity:
+      # <Object> 配置选择器亲和性
+        nodeAffinity:
+        # <Object> 节点亲和性
+          preferredDuringSchedulingIgnoredDuringExecution:
+          # <[]Object> 尽量满足的亲和定义,软亲和性   
+          - preference:
+            # <Object> 尽量满足倾向性
+              matchExpressions:
+              # <[]Object> 基于给的表达式来定义使用标签选择器,格式如下
+                - {key: tier, operator: In, values: ["cache"]} 
+              matchFields:
+            # <[]Object> 节点字段选择器
+              - key: zone
+              # <string> -required-检查标签的key
+                operator: in
+                # <string> -required- 等值操作符选择
+                values:
+                # <[]string> 给定值
+                - foo
+                - bar
+            weight: 60
+            # <integer> -required- 定义倾向性权重            
+          requiredDuringSchedulingIgnoredDuringExecution:
+          # <Object> 必须满足的亲和定义,硬亲和性
+            nodeSelectorTerms:
+            # <[]Object> -required-节点选择器
+            - matchExpressions:
+              # <[]Object>基于给的表达式来定义使用标签选择器,格式如下
+              # 比较常用
+                - {key: tier, operator: In, values: ["cache"]} 
+            - matchFields:
+            # <[]Object> 节点字段选择器
+              - key: zone
+              # <string> -required-检查标签的key
+                operator: in
+                # <string> -required- 等值操作符选择
+                values:
+                # <[]string> 给定值
+                - foo
+                - bar
+        podAffinity:
+        # <Object> pod亲和性
+          preferredDuringSchedulingIgnoredDuringExecution:
+          # <[]Object> 尽量满足的亲和定义,软亲和性   
+          - podAffinityTerm:
+          # <Object> -required-pod尽量满足
+            topologyKey: kubernetes.io/hostname
+          # <string> -required- 位置拓扑键,指定与什么位置亲和
+            namespaces: xxxx
+          # <[]string> 指定下面设置的pod是哪一个名称空间中的
+          # 如果不指定默认为当前创建 pod的名称空间中
+            labelSelector:
+          # <Object> 标签选择器,选定跟哪一组pod亲和
+              matchFields:
+            # <[]Object> 节点字段选择器
+              - key: zone
+              # <string> -required-检查标签的key
+                operator: in
+                # <string> -required- 等值操作符选择
+                values:
+                # <[]string> 给定值
+                - foo
+                - bar     
+              matchLabels:
+              # <map[string]string> 支持给定多个键值对,格式如下
+                app: myapp
+                release: canary   
+            weight: 60
+          requiredDuringSchedulingIgnoredDuringExecution:
+          # <[]Object> 必须满足的亲和定义,硬亲和性
+          - topologyKey: kubernetes.io/hostname
+          # <string> -required- 位置拓扑键,指定与什么位置亲和
+            namespaces: xxxx
+          # <[]string> 指定下面设置的pod是哪一个名称空间中的
+          # 如果不指定默认为当前创建 pod的名称空间中
+            labelSelector:
+          # <Object> 标签选择器,选定跟哪一组pod亲和
+              matchFields:
+            # <[]Object> 节点字段选择器
+              - key: zone
+              # <string> -required-检查标签的key
+                operator: in
+                # <string> -required- 等值操作符选择
+                values:
+                # <[]string> 给定值
+                - foo
+                - bar     
+              matchLabels:
+              # <map[string]string> 支持给定多个键值对,格式如下
+                app: myapp
+                release: canary   
+        podAntiAffinity:
+        # <Object> pod反亲和性,不能符合下面指定的条件
+          preferredDuringSchedulingIgnoredDuringExecution:
+          # <[]Object> 尽量满足的亲和定义,软亲和性
+          - podAffinityTerm:
+          # <Object> -required-pod尽量满足
+            topologyKey: kubernetes.io/hostname
+          # <string> -required- 位置拓扑键,指定与什么位置亲和
+            namespaces: xxxx
+          # <[]string> 指定下面设置的pod是哪一个名称空间中的
+          # 如果不指定默认为当前创建 pod的名称空间中
+            labelSelector:
+          # <Object> 标签选择器,选定跟哪一组pod亲和
+              matchFields:
+            # <[]Object> 节点字段选择器
+              - key: zone
+              # <string> -required-检查标签的key
+                operator: in
+                # <string> -required- 等值操作符选择
+                values:
+                # <[]string> 给定值
+                - foo
+                - bar     
+              matchLabels:
+              # <map[string]string> 支持给定多个键值对,格式如下
+                app: myapp
+                release: canary   
+            weight: 60      
+          requiredDuringSchedulingIgnoredDuringExecution:
+          # <[]Object> 必须满足的亲和定义,硬亲和性
+          - topologyKey: kubernetes.io/hostname
+          # <string> -required- 位置拓扑键,指定与什么位置亲和
+            namespaces: xxxx
+          # <[]string> 指定下面设置的pod是哪一个名称空间中的
+          # 如果不指定默认为当前创建 pod的名称空间中
+            labelSelector:
+          # <Object> 标签选择器,选定跟哪一组pod亲和
+              matchFields:
+            # <[]Object> 节点字段选择器
+              - key: zone
+              # <string> -required-检查标签的key
+                operator: in
+                # <string> -required- 等值操作符选择
+                values:
+                # <[]string> 给定值
+                - foo
+                - bar     
+              matchLabels:
+              # <map[string]string> 支持给定多个键值对,格式如下
+                app: myapp
+                release: canary  
+      tolerations:
+      # <[]Object> 污点容忍度设置,当匹配到污点时按照effect执行容忍操作
+      # 如果节点上有污点,而pod没设置容忍则不会调度到节点上
+      - effect: NoShedule
+      # <string> 定义对Pod排斥效果,设置容忍操作 
+      # NoShedule:仅影响调度过程,对现存的Pod对象不产生影响    
+      # NoExecute:既影响调度过程,也影响现在的Pod对象
+      # 不容忍的Pod对象将被驱逐
+      # PreferNoSchedule:NoShedule优先
+        key: "node-type"
+        # <string> 键
+        operator: "Exists"
+        # <string>比较操作符
+        value: "xxx"
+        # <string> 值
+        tolerationSeconds: 3
+        # <integer> 等多久后被驱逐,默认为0s,马上被驱逐
       serviceAccountName: jcadmin
       # <string> 指定pod连接apiserver时使用的帐号,需要在外面预先创建
       # 也可以用于连接私有的镜像仓库
@@ -58,6 +218,8 @@ spec:
       # <boolean> 是否共享IPC名称空间
       hostPID: false
       # <boolean>是否共享host主机的PID名称空间
+      hostname: xxxx
+      # <string> 如果pod定义了hostname属性则检查节点hostname是否匹配
       restartPolicy: Always
       # <string> 定义的容器重启策略
       # Always(挂了必须重启)
@@ -353,7 +515,7 @@ spec:
           release: canary
         matchExpressions:
         # <[]Object>基于给的表达式来定义使用标签选择器,格式如下
-          - {key: tier, operator: In, values: [cache]}
+          - {key: tier, operator: In, values: ["cache"]}
           # 支持一下操作符:
           # In,    NotIn:    字段的值必须非空列表
           # Exists, NotExists:    字段的值必须未空列表
