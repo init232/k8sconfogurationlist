@@ -86,7 +86,7 @@ spec:
                 - foo
                 - bar
             weight: 60
-            # <integer> -required- 定义倾向性权重            
+            # <integer> -required- 定义倾向性权重,多个preference时进行对比            
           requiredDuringSchedulingIgnoredDuringExecution:
           # <Object> 必须满足的亲和定义,硬亲和性
             nodeSelectorTerms:
@@ -251,6 +251,21 @@ spec:
       # <[]Object> -required-指定容器对象资源,可以设置多个每个-name配置段设置一个
       - name: myapp
       # <string>指定容器名称
+      resources:
+      # <Object> 资源请求与限制指标,两个指标需要同时使用
+      # cpu限制中,1颗虚拟CPU=1000个millicoresCPU
+      # 因此,500m的cpu等0.5CPU
+      # 1000进制内存计量单位:E、P、T、G、M、K、
+      # 1024进制内存计量单位:Ei、Pi、Ti、Gi、Mi、Ki、
+      # https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+        limits: 
+        # <map[string]string>指定pod资源最低需求
+          cpu: "200m"
+          memory: "64Mi"
+        requests:
+        # <map[string]string>指定pod资源限制最大限制
+          cpu: "200m"
+          memory: "64Mi"
         image: ikubernetes/myapp:v1
         # <string>指定镜像资源
         imagePullPolicy: Always
