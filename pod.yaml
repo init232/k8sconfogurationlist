@@ -415,7 +415,7 @@ spec:
       # <integer>探测失败容忍次数,默认为3,最小值为1
       periodSeconds: 10
       # <integer>每次探测间隔时间,默认10s
-      timeoutSeconds:
+      timeoutSeconds: 1
       # <integer>每次探测超时时间,默认1s
       initialDelaySeconds: 5
       # <integer>容器启动后多久开始探测,默认0s
