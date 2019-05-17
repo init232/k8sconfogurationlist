@@ -8,7 +8,7 @@ metadata:
   # <string>指定资源名称
   namespace: default
   # <string>指定名称空间,默认为default
-  labels:
+  labels: 
   # <map[string]string>指定标签格式为k:v,可以多个,每行一个
     app: rs-myapp
   annotations:  
@@ -20,7 +20,7 @@ spec:
   backend:
   # <Object>默认的后端用于服务那些没有匹配到任何规则的请求
   # 用于指定一个全局默认的后端
-    serviceName: myapp
+    serviceName: myapp 
     # <string> -required-指定用于生成配置的后端service名称
     servicePort: 80
     # <string> -required-指定用于生成配置的后端service端口
