@@ -14,7 +14,7 @@ spec:
   # <[]Object> 定义出站规则- {}表示允许所有
   # 如果定义代表拒绝所有
   - to:
-  # <[]Object> 对方目标地址,三选一
+  # <[]Object> 对方目标地址,一般三选一，如果配置了3个则满足其一就会生效
     - namespaceSelector：
     # <Object> 名称空间选择器
       matchLabels:
@@ -56,7 +56,7 @@ spec:
   # <[]Object> 定义入站规则,如果设置- {}表示允许所有
   # 如果定义代表拒绝所有
   - from:
-  # <[]Object> 本地pod目标地址
+  # <[]Object> 对端pod目标地址，一般三选一，如果配置了3个则满足其一就会生效
     - namespaceSelector：
     # <Object> 名称空间选择器
       matchLabels:
